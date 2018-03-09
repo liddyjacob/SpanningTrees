@@ -12,11 +12,12 @@
 
 #include "edge.hpp"
 
+enum Type {DISTANCE, PRICE};
+
 
 struct AdjacencyList{
 
   std::map<std::string, std::vector<Edge> > map;
-
   AdjacencyList(){}
 
   void add(std::string city){
@@ -38,8 +39,26 @@ struct AdjacencyList{
     map[city].push_back(e);
   }
 
+  std::vector<std::pair<std::string, Edge> > pairs(){
+
+    std::vector<std::pair<std::string, Edge> > pairs;
+
+    for (auto it : map){
+
+      for (auto edge : it.second){ 
+        pairs.push_back(std::make_pair(it.first, edge));
+      }  
+
+    }
+
+    return pairs;
+
+  }
+
   int size(){ return map.size(); }
+
 };
+
 
 
 class Graph{
@@ -52,14 +71,16 @@ class Graph{
     Graph(std::vector<std::string> cities);
 
     void show(std::ostream& output);
+    std::vector<std::pair<std::string, Edge> > edges(){return list.pairs();}
 
     bool contains(std::string city)
     { return list.map.find(city) != list.map.end(); }
-
+    
+    bool isCyclic() {return false;} //TODO FIXME
 
 
     void add(std::string node){list.add(node);}
-  
+
     void edge(std::string city, Edge e){list.edge(city, e);}
 
     int size(){ return list.size(); }
@@ -70,6 +91,7 @@ class Graph{
     AdjacencyList list;
     
 };
+
 
 Graph::Graph(std::vector<std::string> cities){
   for (city : cities){

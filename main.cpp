@@ -5,10 +5,10 @@
 #include <fstream>
 
 #include "graph.hpp"
+#include "graphutils.hpp"
 #include "interpret.hpp"
 
 int main(int argc, char** argv){
-
 
   //TODO: Change filename to input.
   std::string filename = "airline_data1.txt";
@@ -21,5 +21,11 @@ int main(int argc, char** argv){
   fill(airlines, data);
   airlines.show(std::cout);
 
+  std::cout << "##### MINIMUM SPANNING TREE ######" << std::endl << std::endl;
+
+  find_MST(airlines).show(std::cout);
+
   data.close();
+
+  return 0;
 }
