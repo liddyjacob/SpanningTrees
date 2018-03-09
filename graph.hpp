@@ -1,6 +1,5 @@
 // graph.hpp
 // Represent a graph with an adjacency list
-
 #pragma once
 
 #include <iomanip>
@@ -76,8 +75,7 @@ class Graph{
     bool contains(std::string city)
     { return list.map.find(city) != list.map.end(); }
     
-    bool isCyclic() {return false;} //TODO FIXME
-
+    bool isCyclic();
 
     void add(std::string node){list.add(node);}
 
@@ -118,5 +116,11 @@ void Graph::show(std::ostream& output){
     }
 
   }
+
+}
+
+bool Graph::isCyclic(){
+
+
 
 }
