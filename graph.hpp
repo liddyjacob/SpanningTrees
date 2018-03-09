@@ -1,6 +1,10 @@
 // graph.hpp
 // Represent a graph with an adjacency list
 
+#pragma once
+
+#include <iomanip>
+#include <iostream>
 #include <string>
 #include <vector>
 #include <map>
@@ -24,13 +28,14 @@ struct AdjacencyList{
 
   }
 
-  void edge(std::string city1, Edge e){
+  void edge(std::string city, Edge e){
     
-    if (map.find(city1) == map.end() | map.find(e.city) == map.end()){
-      std::cerr << city1 << " or " << e.city << "are not currently stored\n";
+    if (map.find(city) == map.end() | map.find(e.city) == map.end()){
+      std::cerr << city << " or " << e.city << "are not currently stored\n";
       return;
     }
 
+    map[city].push_back(e);
   }
 
   int size(){ return map.size(); }
@@ -46,11 +51,19 @@ class Graph{
 
     Graph(std::vector<std::string> cities);
 
+    void show(std::ostream& output);
+
+    bool contains(std::string city)
+    { return list.map.find(city) != list.map.end(); }
+
+
+
     void add(std::string node){list.add(node);}
   
     void edge(std::string city, Edge e){list.edge(city, e);}
 
     int size(){ return list.size(); }
+
 
   private:
 
@@ -62,4 +75,26 @@ Graph::Graph(std::vector<std::string> cities){
   for (city : cities){
     list.add(city);
   }
+}
+
+void Graph::show(std::ostream& output){
+
+  for (auto it : list.map){
+    
+    std::string city = it.first;
+    output << "## " << city << " ##" << std::endl;
+
+    std::vector<Edge> edges = it.second;
+
+    for (Edge edge : edges){
+
+      output << std::setprecision (2) << std::fixed;
+      output << '\t' << city << "->" << edge.city;
+      output << ": " << edge.distance << " miles;";
+      output << " $"  << edge.price << std::endl;
+
+    }
+
+  }
+
 }
