@@ -11,6 +11,7 @@
 #include <stdio.h>
 
 #include "graph.hpp"
+#include "graphutils.hpp"
 
 bool isInteger(const std::string& s);
 bool isCity(const std::string& s);
@@ -19,7 +20,6 @@ bool isDouble(const std::string& s);
 
 std::pair<std::string, Edge>
 parseEdge(std::string line, std::vector<std::string> citynumbers);
-
 std::vector<std::string> split(const std::string& s, char delim);
 
 bool parse(Graph& g, std::string line, std::vector<std::string>& citynumbers){  
@@ -105,11 +105,7 @@ bool isDouble(const std::string& s){
 
 bool isCity(const std::string& s){
 
-  for (char c : s){
-    if (!isalpha(c)) { return false; }
-  }
-
-  return true;
+  return !isEdge(s) && !isDouble(s);
 }
 
 bool isEdge(const std::string& s){

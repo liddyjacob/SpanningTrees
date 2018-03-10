@@ -7,11 +7,26 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <algorithm>
 #include <iostream>
 
 #include "edge.hpp"
 
-enum Type {DISTANCE, PRICE};
+using std::vector;
+using std::string;
+using std::pair;
+
+enum Type {DISTANCE, PRICE, LEXICOGRAPHIC};
+
+// Eliminate repeated edges and sort by parameter 
+bool comp_dist(pair<string, Edge> p1, pair<string, Edge> p2);
+bool comp_price(pair<string, Edge> p1, pair<string, Edge> p2);
+bool comp_lex(pair<string, Edge> p1, pair<string, Edge> p2);
+
+
+
+vector<pair<string, Edge> >
+sort_edges(vector< pair<string, Edge> > pairs, Type sortby);
 
 
 struct AdjacencyList{
@@ -41,7 +56,6 @@ struct AdjacencyList{
   std::vector<std::pair<std::string, Edge> > pairs(){
 
     std::vector<std::pair<std::string, Edge> > pairs;
-
     for (auto it : map){
 
       for (auto edge : it.second){ 
@@ -51,7 +65,6 @@ struct AdjacencyList{
     }
 
     return pairs;
-
   }
 
   int size(){ return map.size(); }
@@ -70,12 +83,14 @@ class Graph{
     Graph(std::vector<std::string> cities);
 
     void show(std::ostream& output);
+    void show_edges(std::ostream& output);
+
     std::vector<std::pair<std::string, Edge> > edges(){return list.pairs();}
 
     bool contains(std::string city)
     { return list.map.find(city) != list.map.end(); }
     
-    bool isCyclic();
+    bool isCyclic(std::string old_city, std::string new_city);
 
     void add(std::string node){list.add(node);}
 
@@ -83,13 +98,14 @@ class Graph{
 
     int size(){ return list.size(); }
 
-
   private:
 
     AdjacencyList list;
-    
-};
+    bool isCyclicUtil(std::string prev_city, 
+                      std::string new_city,
+                      std::map<std::string, bool>& visited);  
 
+};
 
 Graph::Graph(std::vector<std::string> cities){
   for (city : cities){
@@ -116,11 +132,115 @@ void Graph::show(std::ostream& output){
     }
 
   }
+}
+
+void Graph::show_edges(std::ostream& output){ 
+
+  vector<pair<string, Edge> > undir_edges;
+    undir_edges = sort_edges(edges(), LEXICOGRAPHIC);
+
+  for (auto pair : undir_edges){
+
+    string city = pair.first;
+    Edge edge = pair.second;
+
+    {
+      output << std::setprecision(2) << std::fixed;
+      output << city << "<--->" << edge.city;
+      output << ": " << edge.distance << " miles;";
+      output << " $"  << edge.price << std::endl;
+    }
+
+  }
+
+  
 
 }
 
-bool Graph::isCyclic(){
+bool Graph::isCyclic(std::string old_city, std::string new_city){
+
+  std::map<std::string, bool> visited;
+
+  for (auto it : list.map){
+    visited[it.first] = false;
+  }
+
+ isCyclicUtil(old_city, new_city, visited);
+
+  return visited[old_city];
+}
+
+bool Graph::isCyclicUtil(std::string prev_city,
+                  std::string new_city, 
+                  std::map<std::string, bool>& visited){
+
+  visited[new_city] = true;
+  
+  for (Edge edge : list.map[new_city]){
+    
+    if (edge.city != prev_city){
+
+        std::string newnew_city = edge.city;
+
+        if (!visited[newnew_city]){
+          isCyclicUtil(new_city, newnew_city, visited);
+        } else {
+          //Return false?
+        }
+    }
+  }
+
+}
+
+//Eliminate repeated edge.
+vector<pair<string, Edge> > 
+sort_edges(vector< pair<string, Edge> > pairs, Type sortby){
+
+  vector<pair<string, Edge> > sorted_edges; // Must use insertion sort
+
+  std::map<pair<string, string>, bool> connections;
+
+  for (auto p : pairs){
+
+    string city1 = p.first;
+    string city2 = p.second.city;
+
+    pair<string, string> new_connection = std::minmax(city1, city2);
+
+    if (connections.find(new_connection) != connections.end() ){
+      continue; // We already have this connection.
+    } 
+
+    connections[new_connection] = true;
+
+    sorted_edges.push_back(p);
+
+    if (sortby == DISTANCE) {  // TODO: FIX THIS HACK
+     std::sort(sorted_edges.begin(), sorted_edges.end(), comp_dist);     
+    }
+
+    if (sortby == PRICE) {  // TODO: FIX THIS HACK
+     std::sort(sorted_edges.begin(), sorted_edges.end(), comp_price);     
+    }
+
+    if (sortby == LEXICOGRAPHIC){
+      std::sort(sorted_edges.begin(), sorted_edges.end(), comp_lex);
+    }
+  
+  }
+
+  return sorted_edges;
+}
 
 
+bool comp_dist(pair<string, Edge> p1, pair<string, Edge> p2){
+  return p1.second.distance < p2.second.distance;
+}
 
+bool comp_price(pair<string, Edge> p1, pair<string, Edge> p2){
+  return p1.second.price < p2.second.price;
+}
+
+bool comp_lex(pair<string, Edge> p1, pair<string, Edge> p2){
+  return p1.first < p2.first; 
 }
