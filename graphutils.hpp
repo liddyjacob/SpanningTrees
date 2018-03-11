@@ -50,3 +50,23 @@ Graph find_MST(Graph g, Type t){
 
 }
 
+Graph find_shortest(Graph& g, string source, string dest, Type t){
+
+  std::cout << "source: " << source << std::endl;
+  std::cout << "dest: " << dest << std::endl;
+
+  Graph g2;
+
+  return g2;
+}
+
+Graph BFS(Graph g, string source, string dest){
+  std::cout << "source: " << source << std::endl;
+  std::cout << "dest: " << dest << std::endl;
+
+  Graph g2;
+
+  return g2;
+
+
+}
