@@ -125,7 +125,7 @@ Graph find_MST(Graph g, Type t){
 }
 
 pair<std::map<string, Route>, std::map<string, double> >
-find_shortest_routes(Graph& g, string source, Type t){
+find_shortest_routes(Graph& g, string source, Type t, double limit = -1){
 
   std::map<string, Route> routes;
   std::map<std::string, double> dist;
@@ -164,10 +164,16 @@ find_shortest_routes(Graph& g, string source, Type t){
       for (auto adj : g[v]){
 
         double weight;
-
         if (t == DISTANCE) {weight = adj.distance;}
         if (t == PRICE) {weight = adj.price; }
         if (t == HOPS) {weight = 1;}
+
+        if (limit != -1){
+          
+          if (limit < weight + dist[v]){
+            continue;
+          }
+        }
 
         if (dist[adj.city] == -1){
           
@@ -180,8 +186,8 @@ find_shortest_routes(Graph& g, string source, Type t){
           dist[adj.city] = weight + dist[v]; 
 
           routes[adj.city] = Route(routes[v], adj.city);
-
         }
+
         pq.insert(adj.city, dist);
 
       }
@@ -205,37 +211,37 @@ pair<Route, double> find_shortest(Graph& g, string source, string dest, Type t){
 
   return std::make_pair(r,d);
 };
-/*
-struct Comparison{
 
-    Comparison() {}
-
-    // Equiv to less than:
-    bool operator() (const string& left, const string& right){
-
-      double dl = (*dist_ptr)[left];
-      double dr = (*dist_ptr)[right];
-
-      if ( dl == -1.0 && dr == -1.0){
-        std::cerr << "WARNING: Comparing infinite distance\n";
-        return false;
-      }
-
-      // -1 represents infinity.
-      if (dl == -1) { return false;}
-
-      return (dl < dr);
-    }
-
-    std::map<string, double>* dist_ptr = &dist;
+pair <vector<Route>, vector<double> > budget_trips(Graph& g, double& budget){
   
-  };
-*/
-Graph BFS(Graph g, string source, string dest){
-  std::cout << "source: " << source << std::endl;
-  std::cout << "dest: " << dest << std::endl;
 
-  Graph g2;
+  pair<vector<Route>, vector<double> > trips;
 
-  return g2;
+  for (string city : g.get_cities()){
+
+
+    auto routes_dists = find_shortest_routes(g, city, PRICE, budget);
+
+    std::map<string, Route> rts_map = routes_dists.first;
+    std::map<string, double> dsts_map = routes_dists.second;
+
+    std::vector<Route> rts;
+    std::vector<double> dsts;
+    for (auto p_r : rts_map){
+      
+      string city = p_r.first;
+      Route r = p_r.second;
+      double dist = dsts_map[city];
+
+      rts.push_back(r);
+      dsts.push_back(dist);
+
+    }
+   trips.first.insert(trips.first.end(),rts.begin(), rts.end()) ; 
+   trips.second.insert(trips.second.end(),dsts.begin(), dsts.end());
+
+  }
+
+  return trips;
 }
+  

@@ -103,6 +103,19 @@ void parse(int argc, char** argv, Commands& commands){
 
     commands.type = BUDGET;
 
+    if (argc != 3){
+      std::cerr << "Type in exactly one value after b\n";
+      commands.type = ERROR;
+      return;
+    }
+
+    if (!isDouble(argv[2])){
+      std::cerr << argv[2] << " is not a valid budget\n";
+      commands.type = ERROR;
+      return; 
+    }
+
+    commands.args.budget = strtod(argv[2], NULL);
   }
 
 }

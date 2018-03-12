@@ -92,6 +92,10 @@ int main(int argc, char** argv){
     std::cout << "### BASED ON DISTANCE ###\n";
     
     pair<Route, double> p = find_shortest(airlines, source, dest, DISTANCE);
+    if (p.first.path.size() == 0){
+      std::cout << "There are no routes between the specified cities\n";
+      return 0;
+    }
     std::cout << "Route: ";
     p.first.display();
     std::cout << "\n\tTotal cost: " << p.second << " Miles.\n";
@@ -113,6 +117,33 @@ int main(int argc, char** argv){
  }
 
   if (commands.type == BUDGET){
+
+    double budget = commands.args.budget;
+
+    auto rvect_pvect = budget_trips(airlines, budget);
+
+    vector<Route> rvect = rvect_pvect.first; // Route vector
+    vector<double> pvect = rvect_pvect.second; // Price vector
+
+    if (rvect.size() != pvect.size()){
+      std::cerr << "Error! Price vector and route vector have different size!" 
+                << std::endl;
+
+      std::cerr << "\t rvect has size " << rvect.size()
+                << "\n\t pvect has size " << pvect.size() << std::endl;
+
+      return -1;
+    }
+
+    std::cout << "All trips given your budget of $" << budget 
+              << ":" << std::endl;
+
+    for (int i = 0; i < rvect.size(); ++i){
+      if (rvect[i].path.size() != 1){
+        rvect[i].display();
+        std::cout << "\n\tPrice:" << pvect[i] << std::endl;
+      }
+    }
 
   }
 

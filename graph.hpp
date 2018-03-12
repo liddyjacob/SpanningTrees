@@ -60,9 +60,7 @@ struct AdjacencyList{
       for (auto edge : it.second){ 
         pairs.push_back(std::make_pair(it.first, edge));
       }  
-
     }
-
     return pairs;
   }
 
@@ -91,16 +89,23 @@ class Graph{
     
     bool isCyclic(std::string old_city, std::string new_city);
 
-    void add(std::string node){list.add(node);}
+    void add(std::string node)
+    {
+      list.add(node);
+      cities.push_back(node);
+    }
 
     void edge(std::string city, Edge e){list.edge(city, e);}
 
     int size(){ return list.size(); }
 
+    std::vector<std::string> get_cities(){return cities;}
+
     std::vector<Edge> operator[](std::string source){ return list.map[source]; }
   private:
 
     AdjacencyList list;
+    std::vector<std::string> cities;
     bool isCyclicUtil(std::string prev_city, 
                       std::string new_city,
                       std::map<std::string, bool>& visited);  
