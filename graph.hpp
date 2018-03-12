@@ -16,7 +16,7 @@ using std::vector;
 using std::string;
 using std::pair;
 
-enum Type {DISTANCE, PRICE, LEXICOGRAPHIC};
+enum Type {DISTANCE, PRICE, HOPS,LEXICOGRAPHIC};
 
 // Eliminate repeated edges and sort by parameter 
 bool comp_dist(pair<string, Edge> p1, pair<string, Edge> p2);
@@ -40,7 +40,6 @@ struct AdjacencyList{
       //New city
       map[city] = std::vector<Edge>();
     }
-
   }
 
   void edge(std::string city, Edge e){
@@ -98,6 +97,7 @@ class Graph{
 
     int size(){ return list.size(); }
 
+    std::vector<Edge> operator[](std::string source){ return list.map[source]; }
   private:
 
     AdjacencyList list;

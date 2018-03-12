@@ -1,14 +1,89 @@
 // Graph utilities.
+
+/*
+IN THIS FILE: mst is an implimentation of Kruskals,
+              shortest is an impl. of Dijkstras
+*/
+
 #pragma once
 
 #include <map>
 #include <algorithm>
+//#include <queue>
 
 #include "graph.hpp"
 
 using std::string;
 using std::pair;
 using std::vector;
+
+struct priority_queue{
+
+  vector<string> storage;
+
+  void insert(string s, std::map<string, double>& dist){
+
+    if (dist[s] == -1){
+      storage.push_back(s);
+      return;
+    }
+
+    if (dist[s] == 0){
+      storage.push_back(s);
+      return; 
+    }
+
+    for (int i = 0; i < storage.size(); ++i){
+
+      if (dist[storage[i]] == -1){
+        storage.insert(storage.begin() + i, s);
+        return;
+      }
+
+      if (dist[storage[i]] > dist[s]){
+        storage.insert(storage.begin() + i, s);
+        return;
+      }
+    }
+
+    storage.push_back(s);
+
+  }
+
+  string pop(){
+    string s = storage[0];
+    storage.erase(storage.begin());
+
+    return s;
+  }
+};
+
+struct Route{
+
+  Route(const Route& cpy, string add){
+    path = cpy.path;
+    path.push_back(add);
+  }
+
+  Route(){}
+
+  Route(string source){
+    path.push_back(source);
+  }
+
+  void display(){
+
+    for (int i = 0; i < path.size(); ++i){
+      string p = path[i];
+      std::cout << p; 
+      if (i != path.size() - 1) {std::cout << " -> ";}
+
+    }
+  }
+
+  vector<string> path;
+};
+
 
 Graph find_MST(Graph g, Type t){
   //First list edges in order of greatest to least size:
@@ -47,19 +122,115 @@ Graph find_MST(Graph g, Type t){
   //return err_g;
 
   return mst;
-
 }
 
-Graph find_shortest(Graph& g, string source, string dest, Type t){
+pair<std::map<string, Route>, std::map<string, double> >
+find_shortest_routes(Graph& g, string source, Type t){
 
-  std::cout << "source: " << source << std::endl;
-  std::cout << "dest: " << dest << std::endl;
+  std::map<string, Route> routes;
+  std::map<std::string, double> dist;
 
-  Graph g2;
 
-  return g2;
+  if (!g.contains(source)){
+    std::cerr << "Graph does not contain " << source << std::endl;
+    return std::make_pair(routes, dist);
+ }
+
+  
+  std::map<std::string, bool> visited;
+    visited[source] = false;
+
+  dist[source] = 0.0;
+  routes[source] = Route(source);
+
+  priority_queue pq;
+    pq.insert(source, dist);
+
+  for (auto pair : g.edges()){
+    string city = pair.first;
+    if (city != source){
+      dist[city] = -1;
+      visited[city] = false;
+    }
+  }
+
+  while (pq.storage.size() != 0){
+    string v = pq.pop();
+
+    if (!visited[v]) {
+
+      visited[v] = true;
+
+      for (auto adj : g[v]){
+
+        double weight;
+
+        if (t == DISTANCE) {weight = adj.distance;}
+        if (t == PRICE) {weight = adj.price; }
+        if (t == HOPS) {weight = 1;}
+
+        if (dist[adj.city] == -1){
+          
+          dist[adj.city] = weight + dist[v];
+
+          routes[adj.city] = Route(routes[v], adj.city);
+
+        } else if (dist[adj.city] > weight + dist[v]){
+
+          dist[adj.city] = weight + dist[v]; 
+
+          routes[adj.city] = Route(routes[v], adj.city);
+
+        }
+        pq.insert(adj.city, dist);
+
+      }
+    }
+  }
+
+  return std::make_pair(routes, dist);
 }
 
+pair<Route, double> find_shortest(Graph& g, string source, string dest, Type t){
+
+  if (!g.contains(dest)){
+    std::cerr << "Graph does not contain " << dest << std::endl;
+    return std::make_pair(Route(), -1);
+  } 
+
+  auto routes_dists = find_shortest_routes(g, source, t);
+
+  Route r = routes_dists.first[dest];
+  double d = routes_dists.second[dest];
+
+  return std::make_pair(r,d);
+};
+/*
+struct Comparison{
+
+    Comparison() {}
+
+    // Equiv to less than:
+    bool operator() (const string& left, const string& right){
+
+      double dl = (*dist_ptr)[left];
+      double dr = (*dist_ptr)[right];
+
+      if ( dl == -1.0 && dr == -1.0){
+        std::cerr << "WARNING: Comparing infinite distance\n";
+        return false;
+      }
+
+      // -1 represents infinity.
+      if (dl == -1) { return false;}
+
+      return (dl < dr);
+    }
+
+    std::map<string, double>* dist_ptr = &dist;
+  
+  };
+*/
 Graph BFS(Graph g, string source, string dest){
   std::cout << "source: " << source << std::endl;
   std::cout << "dest: " << dest << std::endl;
@@ -67,6 +238,4 @@ Graph BFS(Graph g, string source, string dest){
   Graph g2;
 
   return g2;
-
-
 }

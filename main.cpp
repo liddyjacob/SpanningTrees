@@ -34,11 +34,11 @@ int main(int argc, char** argv){
               << "To load a graph file: \n"
               << "\t./graph l (graph_file)\n"
               << "To view the routes in the graph\n"
-              << "\t./graph v"
+              << "\t./graph v\n"
               << "To find the minimum spanning tree based off distance:\n"
               << "\t./graph mst\n"
               << "To find the shortest paths from source city to dest city:\n"
-              << "\t./graph s -s (source) -d (dest)"
+              << "\t./graph s -s (source) -d (dest)\n"
               << "To find the trips given a specified budget:\n"
               << "\t./graph b (budget)"
               << std::endl;
@@ -91,17 +91,26 @@ int main(int argc, char** argv){
     std::cout << "###### SHORTEST PATHS ######\n";
     std::cout << "### BASED ON DISTANCE ###\n";
     
-    find_shortest(airlines, source, dest, DISTANCE).show_edges(std::cout);
+    pair<Route, double> p = find_shortest(airlines, source, dest, DISTANCE);
+    std::cout << "Route: ";
+    p.first.display();
+    std::cout << "\n\tTotal cost: " << p.second << " Miles.\n";
     
     std::cout << "\n### BASED ON PRICE ###\n";
 
-    find_shortest(airlines, source, dest, PRICE).show_edges(std::cout);
+    p = find_shortest(airlines, source, dest, PRICE);
+    std::cout << "Route: ";
+    p.first.display();
+    std::cout << "\n\tTotal cost: $" << p.second << "\n";
 
     std::cout << "\n### BASED ON HOPS ###\n";
+ 
+    p = find_shortest(airlines, source, dest, HOPS);
+    std::cout << "Route: ";
+    p.first.display();
+    std::cout << "\n\tTotal hops: " << p.second << "\n";
 
-    BFS(airlines, source, dest).show_edges(std::cout);
-
-  }
+ }
 
   if (commands.type == BUDGET){
 
