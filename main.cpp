@@ -141,7 +141,7 @@ int main(int argc, char** argv){
     for (int i = 0; i < rvect.size(); ++i){
       if (rvect[i].path.size() != 1){
         rvect[i].display();
-        std::cout << "\n\tPrice:" << pvect[i] << std::endl;
+        std::cout << "\n\tPrice: $" << pvect[i] << std::endl;
       }
     }
 

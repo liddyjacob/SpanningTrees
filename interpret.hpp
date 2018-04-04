@@ -60,7 +60,6 @@ bool parse(Graph& g, std::string line, std::vector<std::string>& citynumbers){
   }
 
   return false;
-
 }
 
 
@@ -70,7 +69,8 @@ void fill(Graph& g, std::ifstream& file){
   std::vector<std::string> citynumbers;
 
   while (std::getline(file, line)){
-  
+    if (line.back() == '\r'){ line.pop_back(); }
+
     if (!parse(g, line, citynumbers)){
       std::cerr << "Did not accept the line:\n\t" << line << std::endl;
     }

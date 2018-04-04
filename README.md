@@ -13,6 +13,8 @@ To compile the program:
 
 `./graph (arguments)`
 
+READ THIS: YOU MUST FIRST LOAD A GRAPH FILE TO USE THE OTHER ARGUMENTS!
+
 Here are the possible arguments:
 
 `
